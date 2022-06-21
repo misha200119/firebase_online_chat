@@ -33,7 +33,7 @@ const initialSate: authorizationState = {
 };
 
 export const userSlice = createSlice({
-  name: 'authorization',
+  name: 'userAuth',
   initialState: initialSate,
   reducers: {
     setUser: (state, action: PayloadAction<UserCredential>) => {
@@ -53,7 +53,8 @@ export const {
 } = userSlice.actions;
 
 export const selectors = {
-  getUserInfo: (state: RootState) => state.user,
+  getUserInfo: (state: RootState) => state.user.user,
+  getUserСredential: (state: RootState) => state.user.credential,
 };
 
 export default userSlice.reducer;

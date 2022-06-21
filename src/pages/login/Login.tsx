@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Button,
@@ -9,10 +8,11 @@ import React, {
   FC,
   memo,
   useCallback,
-  useEffect,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { CHAT_ROUTE } from '../../utils/constansts';
 import { useAppDispatch } from '../../hooks/typedReduxHooks';
 import { selectors } from '../../store/slices/firebaseSlice';
 import { setUser } from '../../store/slices/userSlice';
@@ -21,6 +21,7 @@ export const Login: FC<{}> = memo(() => {
   const app = useSelector(selectors.getFirebaseApp);
   const auth = getAuth(app);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const singInWithGoogle = useCallback(async () => {
     try {
@@ -29,10 +30,11 @@ export const Login: FC<{}> = memo(() => {
       const result = await signInWithPopup(auth, provider);
 
       dispatch(setUser(result));
+      navigate(CHAT_ROUTE);
     } catch (e) {
       throw new Error('some issue with sing in with google token');
     }
-  }, [auth]);
+  }, [auth, navigate]);
 
   return (
     <Container>

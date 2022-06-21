@@ -8,6 +8,21 @@ export const store = configureStore({
     user: userReducer,
     firebaseApp: firebaseAppReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      // Ignore these action types
+      ignoredActions: ['userAuth/setUser'],
+      // Ignore these field paths in all actions
+      // ignoredActionPaths: ['meta.arg', 'payload.timestamp'],
+      // Ignore these paths in the state
+      ignoredPaths: [
+        'user.user',
+        'user.credential',
+        'firebaseApp.app',
+        'firebaseApp.database',
+      ],
+    },
+  }),
 });
 
 export default store;

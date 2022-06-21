@@ -5,15 +5,16 @@ import { selectors } from '../store/slices/userSlice';
 interface AuthUserInfo {
   isAuth: boolean;
   user: User | null;
-  credentional: OAuthCredential | null;
+  credential: OAuthCredential | null;
 }
 
 export const useAuth = (): AuthUserInfo => {
-  const info = useSelector(selectors.getUserInfo);
+  const user = useSelector(selectors.getUserInfo);
+  const credential = useSelector(selectors.getUserСredential);
 
   return {
-    isAuth: !!info.user,
-    user: info.user,
-    credentional: info.credential,
+    isAuth: !!user,
+    user,
+    credential,
   };
 };

@@ -15,6 +15,7 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Database, getDatabase } from 'firebase/database';
 import { RootState } from '../../types/storeTypes';
 
 const firebaseConfig = {
@@ -27,12 +28,17 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app, process.env.REACT_APP_FIREBASE_DATABASE_URL);
+
 interface authorizationState {
   app: FirebaseApp | undefined;
+  database: Database;
 }
 
 const initialSate: authorizationState = {
-  app: initializeApp(firebaseConfig),
+  app,
+  database,
 };
 
 export const firebaseSlice = createSlice({
@@ -47,6 +53,7 @@ export const firebaseSlice = createSlice({
 
 export const selectors = {
   getFirebaseApp: (state: RootState) => state.firebaseApp.app,
+  getDatabase: (state: RootState) => state.firebaseApp.database,
 };
 
 export default firebaseSlice.reducer;
