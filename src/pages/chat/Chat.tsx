@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 
-export const Chat: FC<{}> = () => {
+export const Chat: FC<{}> = memo(() => {
   return (
     <div>chat page</div>
   );
-};
+});

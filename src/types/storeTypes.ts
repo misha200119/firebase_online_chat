@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import rootStore from '../store';
 
 export type RootState = ReturnType<typeof rootStore.getState>;

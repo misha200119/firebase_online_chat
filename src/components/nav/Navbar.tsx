@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import {
   AppBar,
   IconButton,
@@ -13,32 +13,32 @@ import {
   Tooltip,
   Avatar,
 } from '@mui/material';
-// import MenuIcon from '@mui/icons-material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import ChatIcon from '@mui/icons-material/Chat';
 import { NavLink } from 'react-router-dom';
-import { selectors } from '../../store/slices/userSlice';
 import { LOGIN_ROUTE } from '../../utils/constansts';
+import { useAuth } from '../../hooks/useAuth';
 
-// const pages = ['Products', 'Pricing', 'Blog'];
+const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export const Navbar: FC<{}> = () => {
-  const isLoggedIn = useSelector(selectors.getIsLoggedIn);
+  const { isAuth: isLoggedIn } = useAuth();
 
-  // const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-  // const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-  //   setAnchorElNav(event.currentTarget);
-  // };
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -64,11 +64,11 @@ export const Navbar: FC<{}> = () => {
                 textDecoration: 'none',
               }}
             >
-              Chat roulette first
+              Chat roulette
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              {/* <IconButton
+              <IconButton
                 size="large"
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
@@ -101,7 +101,7 @@ export const Navbar: FC<{}> = () => {
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
-              </Menu> */}
+              </Menu>
             </Box>
             <ChatIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Typography
@@ -118,9 +118,9 @@ export const Navbar: FC<{}> = () => {
                 textDecoration: 'none',
               }}
             >
-              Chat roulette second
+              Chat roulette
             </Typography>
-            {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                 <Button
                   key={page}
@@ -130,7 +130,7 @@ export const Navbar: FC<{}> = () => {
                   {page}
                 </Button>
               ))}
-            </Box> */}
+            </Box>
 
             <Box sx={{ flexGrow: 0 }}>
               {

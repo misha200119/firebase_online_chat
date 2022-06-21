@@ -14,33 +14,46 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  GoogleAuthProvider,
+  OAuthCredential,
+  User,
+  UserCredential,
+} from 'firebase/auth';
 import { RootState } from '../../types/storeTypes';
 
 interface authorizationState {
-  isLoggedIn: boolean;
+  user: User | null;
+  credential: OAuthCredential | null;
 }
 
 const initialSate: authorizationState = {
-  isLoggedIn: false,
+  user: null,
+  credential: null,
 };
 
 export const userSlice = createSlice({
   name: 'authorization',
   initialState: initialSate,
   reducers: {
-    setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
-      state.isLoggedIn = action.payload;
+    setUser: (state, action: PayloadAction<UserCredential>) => {
+      state.user = action.payload.user;
+
+      state.credential = GoogleAuthProvider.credentialFromResult(action.payload);
+    },
+    removeUser: (state) => {
+      state.user = null;
     },
   },
 });
 
 export const {
-  setIsLoggedIn,
-
+  setUser,
+  removeUser,
 } = userSlice.actions;
 
 export const selectors = {
-  getIsLoggedIn: (state: RootState) => state.user.isLoggedIn,
+  getUserInfo: (state: RootState) => state.user,
 };
 
 export default userSlice.reducer;

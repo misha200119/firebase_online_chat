@@ -1,7 +1,6 @@
-import React, { FC } from 'react';
-import { useSelector } from 'react-redux';
+import React, { FC, memo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { selectors } from '../../store/authorizationSlice';
+import { useAuth } from '../../hooks/useAuth';
 import { Navbar } from '../nav';
 import {
   ROOT_PATH,
@@ -11,15 +10,16 @@ import {
   CHAT_ROUTE,
 } from '../../utils/constansts';
 
-import './App.scss';
 import { Home } from '../../pages/home';
 import { NotFound } from '../../pages/notFound';
 import { Login } from '../../pages/login';
 import { Chat } from '../../pages/chat';
-// import { AppRouter } from '../appRouter';
 
-export const App: FC<{}> = () => {
-  const isLoggedIn = useSelector(selectors.getIsLoggedIn);
+// import { AppRouter } from '../appRouter';
+import './App.scss';
+
+export const App: FC<{}> = memo(() => {
+  const { isAuth: isLoggedIn } = useAuth();
 
   return (
     <>
@@ -48,4 +48,4 @@ export const App: FC<{}> = () => {
         )}
     </>
   );
-};
+});
