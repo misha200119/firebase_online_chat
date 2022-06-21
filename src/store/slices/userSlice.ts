@@ -14,7 +14,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../types/storeTypes';
+import { RootState } from '../../types/storeTypes';
 
 interface authorizationState {
   isLoggedIn: boolean;
@@ -24,7 +24,7 @@ const initialSate: authorizationState = {
   isLoggedIn: false,
 };
 
-export const authorizationSlice = createSlice({
+export const userSlice = createSlice({
   name: 'authorization',
   initialState: initialSate,
   reducers: {
@@ -37,10 +37,10 @@ export const authorizationSlice = createSlice({
 export const {
   setIsLoggedIn,
 
-} = authorizationSlice.actions;
+} = userSlice.actions;
 
 export const selectors = {
-  getIsLoggedIn: (state: RootState) => state.authorization.isLoggedIn,
+  getIsLoggedIn: (state: RootState) => state.user.isLoggedIn,
 };
 
-export default authorizationSlice.reducer;
+export default userSlice.reducer;

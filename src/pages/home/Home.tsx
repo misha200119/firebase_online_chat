@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
-export const App: FC<{}> = () => {
+export const Home: FC<{}> = () => {
   return (
     <div>
-      nav
+      <h1>HOME PAGE</h1>
     </div>
   );
 };

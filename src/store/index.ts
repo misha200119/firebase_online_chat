@@ -1,10 +1,10 @@
 /* eslint-disable import/no-cycle */
 import { configureStore } from '@reduxjs/toolkit';
-import authorizationReducer from './authorizationSlice';
+import userReducer from './slices/userSlice';
 
 export const store = configureStore({
   reducer: {
-    authorization: authorizationReducer,
+    user: userReducer,
   },
 });
 
