@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-// import { useSelector } from 'react-redux';
 import {
   AppBar,
   IconButton,
@@ -16,14 +15,18 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatIcon from '@mui/icons-material/Chat';
 import { NavLink } from 'react-router-dom';
+import { nanoid } from 'nanoid';
 import { LOGIN_ROUTE } from '../../utils/constansts';
 import { useAuth } from '../../hooks/useAuth';
+import { removeUser } from '../../store/slices/userSlice';
+import { useAppDispatch } from '../../hooks/typedReduxHooks';
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = ['Products', 'Pricing'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export const Navbar: FC<{}> = () => {
-  const { isAuth: isLoggedIn } = useAuth();
+  const { isAuth: isLoggedIn, user } = useAuth();
+  const dispatch = useAppDispatch();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -40,7 +43,18 @@ export const Navbar: FC<{}> = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.currentTarget as HTMLElement;
+
+    switch (target.textContent) {
+      case 'Logout':
+        dispatch(removeUser());
+        break;
+      default:
+        // throw new Error('unexpected selected menu option');
+        break;
+    }
+
     setAnchorElUser(null);
   };
 
@@ -134,12 +148,12 @@ export const Navbar: FC<{}> = () => {
 
             <Box sx={{ flexGrow: 0 }}>
               {
-                isLoggedIn
+                isLoggedIn && user
                   ? (
                     <>
                       <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                          <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                          <Avatar alt="Remy Sharp" src={user.photoURL || ''} />
                         </IconButton>
                       </Tooltip>
                       <Menu
@@ -159,7 +173,7 @@ export const Navbar: FC<{}> = () => {
                         onClose={handleCloseUserMenu}
                       >
                         {settings.map((setting) => (
-                          <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                          <MenuItem key={nanoid()} onClick={handleCloseUserMenu}>
                             <Typography textAlign="center">{setting}</Typography>
                           </MenuItem>
                         ))}

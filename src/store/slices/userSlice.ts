@@ -43,6 +43,7 @@ export const userSlice = createSlice({
     },
     removeUser: (state) => {
       state.user = null;
+      state.credential = null;
     },
   },
 });

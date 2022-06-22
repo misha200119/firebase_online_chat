@@ -32,7 +32,9 @@ export const Login: FC<{}> = memo(() => {
       dispatch(setUser(result));
       navigate(CHAT_ROUTE);
     } catch (e) {
-      throw new Error('some issue with sing in with google token');
+      // eslint-disable-next-line no-console
+      console.log(e);
+      throw new Error('some issue with sing in with google');
     }
   }, [auth, navigate]);
 

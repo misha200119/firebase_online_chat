@@ -17,9 +17,9 @@ import { useSelector } from 'react-redux';
 import {
   ref,
   set,
-  onValue,
   push,
   onChildAdded,
+  Unsubscribe,
 } from 'firebase/database';
 import { nanoid } from 'nanoid';
 import { useAuth } from '../../hooks/useAuth';
@@ -48,17 +48,23 @@ export const Chat: FC<{}> = memo(() => {
     setInputMessage('');
   };
 
+  let closeConnection: Unsubscribe;
+
   useEffect(() => {
-    onChildAdded(messagesRef, (data) => {
+    closeConnection = onChildAdded(messagesRef, (data) => {
       setMessages((prev: Array<Message>) => [...prev, data.val() as Message]);
-      // eslint-disable-next-line no-console
-      // console.log(data.val());
     });
   }, []);
 
-  const onMessagesUpdate = useCallback(() => {
-
+  useEffect(() => {
+    return () => {
+      closeConnection();
+    };
   }, []);
+
+  // const onMessagesUpdate = useCallback(() => {
+
+  // }, []);
 
   return (
     <Container>
