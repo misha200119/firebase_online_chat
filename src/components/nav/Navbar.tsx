@@ -21,8 +21,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { removeUser } from '../../store/slices/userSlice';
 import { useAppDispatch } from '../../hooks/typedReduxHooks';
 
-const pages = ['Products', 'Pricing'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Chat', 'Home', 'Videochat'];
+const settings = ['Profile', 'Logout'];
 
 export const Navbar: FC<{}> = () => {
   const { isAuth: isLoggedIn, user } = useAuth();
