@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  Avatar,
   Button,
   Container,
   Grid,
   TextField,
 } from '@mui/material';
-import React, { FC, memo, useCallback, useState } from 'react';
+import React, {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useSelector } from 'react-redux';
 import {
   ref,
@@ -14,13 +21,16 @@ import {
   push,
   onChildAdded,
 } from 'firebase/database';
+import { nanoid } from 'nanoid';
 import { useAuth } from '../../hooks/useAuth';
 import { selectors } from '../../store/slices/firebaseSlice';
+import { Message } from '../../types/message';
 
 export const Chat: FC<{}> = memo(() => {
-  const { user, credential } = useAuth();
+  const { user } = useAuth();
   const db = useSelector(selectors.getDatabase);
   const messagesRef = ref(db, 'posts');
+  const [messages, setMessages] = useState<Array<Message>>([]);
 
   const [inputMessage, setInputMessage] = useState('');
 
@@ -28,6 +38,7 @@ export const Chat: FC<{}> = memo(() => {
     const newMessagesRef = push(messagesRef);
 
     set(newMessagesRef, {
+      uID: user?.uid,
       username: user?.displayName,
       email: user?.email,
       profile_picture: user?.photoURL,
@@ -39,7 +50,9 @@ export const Chat: FC<{}> = memo(() => {
 
   useEffect(() => {
     onChildAdded(messagesRef, (data) => {
-      addCommentElement(postElement, data.key, data.val().text, data.val().author);
+      setMessages((prev: Array<Message>) => [...prev, data.val() as Message]);
+      // eslint-disable-next-line no-console
+      // console.log(data.val());
     });
   }, []);
 
@@ -65,7 +78,26 @@ export const Chat: FC<{}> = memo(() => {
             overflowY: 'auto',
           }}
         >
-          messages
+          {messages.map(message => (
+            <div
+              key={nanoid()}
+              style={{
+                margin: 10,
+                border: user?.uid === message.uID ? '2px solid green' : '2px solid red',
+                marginLeft: user?.uid === message.uID ? 'auto' : '10px',
+                width: 'fit-content',
+                padding: 5,
+              }}
+            >
+              <Grid container>
+                <Avatar src={message.profile_picture} />
+                <div>{message.username}</div>
+              </Grid>
+              <div>
+                {message.message}
+              </div>
+            </div>
+          ))}
         </div>
 
         <Grid
