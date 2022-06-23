@@ -1,10 +1,6 @@
 import * as React$1 from 'react';
 import React__default, { HTMLAttributes, RefObject, ComponentProps } from 'react';
 
-declare module 'freeice' {
-
-}
-
 declare module 'mdb-react-ui-kit'{
 type BaseComponent = Pick<
 React.HTMLAttributes<HTMLElement>,
