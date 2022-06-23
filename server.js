@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const ioLib = require('socket.io');
 const serverLib = require('http');
+const { version, validate } = require('uuid');
 const ACTIONS = require('./src/socket/actions');
 
 const app = express();
@@ -15,7 +16,8 @@ const PORT = process.env.PORT || 3001;
 function getClientRooms() {
   const { rooms } = io.sockets.adapter;
 
-  return Array.from(rooms.keys());
+  return Array.from(rooms.keys())
+    .filter(roomID => validate(roomID) && version(roomID) === 4);
 }
 
 function shareRoomsInfo() {
@@ -25,9 +27,10 @@ function shareRoomsInfo() {
 }
 
 io.on('connection', socket => {
-  // console.log('Socket connected');
+  console.log('Socket connected');
 
-  shareRoomsInfo();
+  socket.on(ACTIONS.REQUEST_ROOMS, shareRoomsInfo);
+  // shareRoomsInfo();
 
   socket.on(ACTIONS.JOIN, config => {
     const { room: roomID } = config;
@@ -80,6 +83,20 @@ io.on('connection', socket => {
 
   socket.on(ACTIONS.LEAVE, leaveRoom);
   socket.on('disconnecting', leaveRoom);
+
+  socket.on(ACTIONS.RELAY_SDP, ({ peerID, sessionDescription }) => {
+    io.to(peerID).emit(ACTIONS.SESSION_DESCRIPTION, {
+      peerID: socket.id,
+      sessionDescription,
+    });
+  });
+
+  socket.on(ACTIONS.RELAY_ICE, ({ peerID, iceCandidate }) => {
+    io.to(peerID).emit(ACTIONS.ICE_CANDIDATE, {
+      peerID: socket.id,
+      iceCandidate,
+    });
+  });
 });
 
 server.listen(PORT, () => {

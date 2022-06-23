@@ -21,6 +21,7 @@ import {
   onChildAdded,
   Unsubscribe,
 } from 'firebase/database';
+import SendIcon from '@mui/icons-material/Send';
 import { nanoid } from 'nanoid';
 import { useAuth } from '../../hooks/useAuth';
 import { selectors } from '../../store/slices/firebaseSlice';
@@ -121,8 +122,10 @@ export const Chat: FC<{}> = memo(() => {
             onChange={({ target }) => setInputMessage(target.value)}
           />
           <Button
+            variant="contained"
             size="small"
             onClick={writeMessageToDB}
+            endIcon={<SendIcon />}
           >
             Send
           </Button>

@@ -13,7 +13,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: {
       // Ignore these action types
-      ignoredActions: ['userAuth/setUser'],
+      ignoredActions: ['user/setUser'],
       // Ignore these field paths in all actions
       // ignoredActionPaths: ['meta.arg', 'payload.timestamp'],
       // Ignore these paths in the state
@@ -22,6 +22,7 @@ export const store = configureStore({
         'user.credential',
         'firebaseApp.app',
         'firebaseApp.database',
+        'videochat.socket',
       ],
     },
   }),

@@ -13,14 +13,13 @@
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
 } from 'firebase/auth';
 import { Socket } from 'socket.io-client';
 import { RootState } from '../../types/storeTypes';
-import socket from '../../socket';
 import ACTIONS from '../../socket/actions';
+import socket from '../../socket';
 
 interface ChatState {
   socket: Socket;
@@ -32,24 +31,45 @@ const initialSate: ChatState = {
   rooms: [],
 };
 
+export const updateRooms = createAsyncThunk(
+  'videochat/updateRooms',
+  async (rooms :Array<string>, thunkAPI) => {
+    const { dispatch } = thunkAPI;
+
+    // // eslint-disable-next-line no-console
+    // console.log('thunk called');
+
+    dispatch(setRooms(rooms));
+  },
+);
+
+export const requestCurrentRooms = () => {
+  socket.emit(ACTIONS.REQUEST_ROOMS);
+};
+
 export const videochatSlice = createSlice({
   name: 'videochat',
   initialState: initialSate,
   reducers: {
-    startListenRooms: (state) => {
-      state.socket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] } = {}) => {
-        state.rooms = rooms;
-      });
+    setRooms: (state, action: PayloadAction<Array<string>>) => {
+      state.rooms = action.payload;
     },
   },
+  // extraReducers: (builder) => {
+  //   builder.addCase(updateRooms.fulfilled, (state, action) => {
+  //     // Add user to the state array
+  //     state.rooms = action.payload;
+  //   });
+  // },
 });
 
 export const {
-  startListenRooms,
+  setRooms,
 } = videochatSlice.actions;
 
 export const selectors = {
   getRooms: (state: RootState) => state.videochat.rooms,
+  getSocket: (state: RootState) => state.videochat.socket,
 };
 
 export default videochatSlice.reducer;
