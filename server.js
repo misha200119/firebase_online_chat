@@ -11,7 +11,7 @@ const app = express();
 const server = serverLib.createServer(app);
 const io = ioLib(server);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
 
 function getClientRooms() {
   const { rooms } = io.sockets.adapter;
