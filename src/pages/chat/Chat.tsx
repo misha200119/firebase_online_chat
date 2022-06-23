@@ -62,10 +62,6 @@ export const Chat: FC<{}> = memo(() => {
     };
   }, []);
 
-  // const onMessagesUpdate = useCallback(() => {
-
-  // }, []);
-
   return (
     <Container>
       <Grid

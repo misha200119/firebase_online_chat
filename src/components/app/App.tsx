@@ -8,6 +8,7 @@ import {
   HOME_ROUTE,
   LOGIN_ROUTE,
   CHAT_ROUTE,
+  VIDEOCHAT_ROUTE,
 } from '../../utils/constansts';
 
 import { Home } from '../../pages/home';
@@ -17,6 +18,7 @@ import { Chat } from '../../pages/chat';
 
 // import { AppRouter } from '../appRouter';
 import './App.scss';
+import { Videochat } from '../../pages/videochat';
 
 export const App: FC<{}> = memo(() => {
   const { isAuth: isLoggedIn } = useAuth();
@@ -31,6 +33,7 @@ export const App: FC<{}> = memo(() => {
             <Route path={ROOT_PATH} element={<Navigate to={HOME_ROUTE} replace />} />
 
             <Route path={HOME_ROUTE} element={<Home />} />
+            <Route path={VIDEOCHAT_ROUTE} element={<Videochat />} />
             <Route path={CHAT_ROUTE} element={<Chat />} />
 
             <Route path={WRONG_PATH} element={<NotFound />} />

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatIcon from '@mui/icons-material/Chat';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import { LOGIN_ROUTE } from '../../utils/constansts';
 import { useAuth } from '../../hooks/useAuth';
@@ -27,6 +27,7 @@ const settings = ['Profile', 'Logout'];
 export const Navbar: FC<{}> = () => {
   const { isAuth: isLoggedIn, user } = useAuth();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -39,7 +40,24 @@ export const Navbar: FC<{}> = () => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.currentTarget as HTMLElement;
+
+    switch (target.textContent) {
+      case 'Chat':
+        navigate('chat');
+        break;
+      case 'Home':
+        navigate('home');
+        break;
+      case 'Videochat':
+        navigate('videochat');
+        break;
+      default:
+        // throw new Error('unexpected selected menu option');
+        break;
+    }
+
     setAnchorElNav(null);
   };
 
@@ -60,7 +78,9 @@ export const Navbar: FC<{}> = () => {
 
   return (
     <header>
-      <AppBar position="static">
+      <AppBar
+        position="static"
+      >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <ChatIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />

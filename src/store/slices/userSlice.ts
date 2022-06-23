@@ -33,7 +33,7 @@ const initialSate: authorizationState = {
 };
 
 export const userSlice = createSlice({
-  name: 'userAuth',
+  name: 'user',
   initialState: initialSate,
   reducers: {
     setUser: (state, action: PayloadAction<UserCredential>) => {

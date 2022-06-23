@@ -13,36 +13,43 @@
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
 } from 'firebase/auth';
-import { Message } from '../../types/message';
+import { Socket } from 'socket.io-client';
 import { RootState } from '../../types/storeTypes';
+import socket from '../../socket';
+import ACTIONS from '../../socket/actions';
 
 interface ChatState {
-  messages: Array<Message>;
+  socket: Socket;
+  rooms: Array<string>;
 }
 
 const initialSate: ChatState = {
-  messages: [],
+  socket,
+  rooms: [],
 };
 
-export const chatSlice = createSlice({
-  name: 'userAuth',
+export const videochatSlice = createSlice({
+  name: 'videochat',
   initialState: initialSate,
   reducers: {
-    setUser: (state, action: PayloadAction<Message>) => {
-      state.messages.push(action.payload);
+    startListenRooms: (state) => {
+      state.socket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] } = {}) => {
+        state.rooms = rooms;
+      });
     },
   },
 });
 
 export const {
-  setUser,
-} = chatSlice.actions;
+  startListenRooms,
+} = videochatSlice.actions;
 
 export const selectors = {
-  getMessages: (state: RootState) => state.user.user,
+  getRooms: (state: RootState) => state.videochat.rooms,
 };
 
-export default chatSlice.reducer;
+export default videochatSlice.reducer;

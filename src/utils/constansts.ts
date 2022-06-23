@@ -1,4 +1,5 @@
 export const LOGIN_ROUTE = '/login';
+export const VIDEOCHAT_ROUTE = '/videochat';
 export const CHAT_ROUTE = '/chat';
 export const HOME_ROUTE = '/home';
 export const ROOT_PATH = '/';
