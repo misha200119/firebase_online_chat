@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRef, useEffect, useCallback } from 'react';
-import { freeice } from 'freeice';
+import freeice from 'freeice';
 import { useStateWithCallback } from './useStateWithCallback';
 import socket from '../socket';
 import ACTIONS from '../socket/actions';
@@ -45,8 +45,12 @@ export const useWebRTC = (roomID: string) => {
         return console.warn(`Already connected to peer ${peerID}`);
       }
 
+      const stunServer = freeice();
+
+      console.log(stunServer);
+
       peerConnections.current[peerID] = new RTCPeerConnection({
-        iceServers: freeice(),
+        iceServers: stunServer,
       });
 
       peerConnections.current[peerID].onicecandidate = event => {
