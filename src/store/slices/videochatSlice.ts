@@ -36,9 +36,6 @@ export const updateRooms = createAsyncThunk(
   async (rooms :Array<string>, thunkAPI) => {
     const { dispatch } = thunkAPI;
 
-    // // eslint-disable-next-line no-console
-    // console.log('thunk called');
-
     dispatch(setRooms(rooms));
   },
 );
@@ -55,12 +52,6 @@ export const videochatSlice = createSlice({
       state.rooms = action.payload;
     },
   },
-  // extraReducers: (builder) => {
-  //   builder.addCase(updateRooms.fulfilled, (state, action) => {
-  //     // Add user to the state array
-  //     state.rooms = action.payload;
-  //   });
-  // },
 });
 
 export const {

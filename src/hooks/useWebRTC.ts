@@ -25,17 +25,24 @@ interface PeerMediaElements {
 export const useWebRTC = (roomID: string) => {
   const [clients, updateClients] = useStateWithCallback([]);
 
+  const addNewClient = useCallback((newClient, callback) => {
+    updateClients(list => {
+      if (!list.includes(newClient)) {
+        return [...list, newClient];
+      }
+
+      return list;
+    }, callback);
+    // if (!clients.includes(newClient)) {
+    //   updateClients((arr: any) => [...arr, newClient], callback);
+    // }
+  }, [clients, updateClients]);
+
   const peerConnections = useRef<{[key: string]: RTCPeerConnection}>({});
   const localMediaSteam = useRef<MediaStream | null>(null);
   const peerMediaElements = useRef<PeerMediaElements>({
     [LOCAL_VIDEO]: null,
   });
-
-  const addNewClient = useCallback((newClient, callback) => {
-    if (!clients.includes(newClient)) {
-      updateClients((arr: any) => [...arr, newClient], callback);
-    }
-  }, [clients, updateClients]);
 
   useEffect(() => {
     async function handleNewPeer(payload: Payload) {
@@ -53,6 +60,8 @@ export const useWebRTC = (roomID: string) => {
         iceServers: stunServer,
       });
 
+      console.log('peer connection was created');
+
       peerConnections.current[peerID].onicecandidate = event => {
         if (event.candidate) {
           socket.emit(ACTIONS.RELAY_ICE, {
@@ -69,6 +78,7 @@ export const useWebRTC = (roomID: string) => {
 
         // i wait when video & audio track is received
         if (tracksCount === 2) {
+          tracksCount = 0;
           addNewClient(peerID, () => {
             const peerElement = peerMediaElements.current[peerID];
 
@@ -77,29 +87,33 @@ export const useWebRTC = (roomID: string) => {
             }
           });
         }
-
-        const lms = localMediaSteam.current;
-
-        if (lms) {
-          lms.getTracks().forEach(track => {
-            peerConnections.current[peerID].addTrack(track, lms);
-          });
-        }
-
-        if (createOffer) {
-          const offer = await peerConnections.current[peerID].createOffer();
-
-          await peerConnections.current[peerID].setLocalDescription(offer);
-
-          socket.emit(ACTIONS.RELAY_SDP, {
-            peerID,
-            sessionDescription: offer,
-          });
-        }
       };
+
+      const lms = localMediaSteam.current;
+
+      if (lms) {
+        lms.getTracks().forEach(track => {
+          peerConnections.current[peerID].addTrack(track, lms);
+        });
+      }
+
+      if (createOffer) {
+        const offer = await peerConnections.current[peerID].createOffer();
+
+        await peerConnections.current[peerID].setLocalDescription(offer);
+
+        socket.emit(ACTIONS.RELAY_SDP, {
+          peerID,
+          sessionDescription: offer,
+        });
+      }
     }
 
     socket.on(ACTIONS.ADD_PEER, handleNewPeer);
+
+    return () => {
+      socket.off(ACTIONS.ADD_PEER);
+    };
   }, []);
 
   useEffect(() => {
@@ -117,11 +131,17 @@ export const useWebRTC = (roomID: string) => {
     };
 
     socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
+
+    return () => {
+      socket.off(ACTIONS.REMOVE_PEER);
+    };
   }, []);
 
   useEffect(() => {
     async function setRemoteMedia(payload: Payload) {
       const { peerID, sessionDescription: remoteDescription } = payload;
+
+      console.log('session description');
 
       await peerConnections.current[peerID].setRemoteDescription(
         new RTCSessionDescription(remoteDescription),
@@ -140,14 +160,23 @@ export const useWebRTC = (roomID: string) => {
     }
 
     socket.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia);
+
+    return () => {
+      socket.off(ACTIONS.SESSION_DESCRIPTION);
+    };
   }, []);
 
   useEffect(() => {
     socket.on(ACTIONS.ICE_CANDIDATE, ({ peerID, iceCandidate }) => {
+      console.log('ice candidate');
       peerConnections.current[peerID].addIceCandidate(
         new RTCIceCandidate(iceCandidate),
       );
     });
+
+    return () => {
+      socket.off(ACTIONS.ICE_CANDIDATE);
+    };
   }, []);
 
   useEffect(() => {
