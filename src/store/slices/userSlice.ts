@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // there I imported rootState from store because i use it in selectors for this inner state
 
 /* eslint-disable import/no-cycle */
@@ -17,10 +18,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   GoogleAuthProvider,
   OAuthCredential,
+  reauthenticateWithCredential,
   User,
   UserCredential,
 } from 'firebase/auth';
 import { RootState } from '../../types/storeTypes';
+import LocalStorageKeys from '../../utils/localStorageKeys';
+
+const credentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.AUTH_CREDENTIALS) as string);
+const userCredentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.USER_CREDENTIALS) as string);
+const lastSignedUser = reauthenticateWithCredential(userCredentialsFromLocalStorage, credentialsFromLocalStorage);
+
+// eslint-disable-next-line no-console
+console.log(lastSignedUser);
 
 interface authorizationState {
   user: User | null;
@@ -37,9 +47,13 @@ export const userSlice = createSlice({
   initialState: initialSate,
   reducers: {
     setUser: (state, action: PayloadAction<UserCredential>) => {
-      state.user = action.payload.user;
+      const userCredentials = action.payload.user;
+      const credentials = GoogleAuthProvider.credentialFromResult(action.payload);
 
-      state.credential = GoogleAuthProvider.credentialFromResult(action.payload);
+      state.user = userCredentials;
+      state.credential = credentials;
+      localStorage.setItem(LocalStorageKeys.AUTH_CREDENTIALS, JSON.stringify(credentials));
+      localStorage.setItem(LocalStorageKeys.USER_CREDENTIALS, JSON.stringify(userCredentials));
     },
     removeUser: (state) => {
       state.user = null;

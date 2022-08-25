@@ -16,11 +16,13 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { VIDEOCHAT_ROUTE } from '../../utils/constansts';
+// import { VIDEOCHAT_ROUTE } from '../../utils/constansts';
 
 interface Props {
   rooms: Array<string>;
 }
+
+const VIDEOCHAT_ROUTE = '123';
 
 export const ChatList:FC<Props> = memo(({ rooms }) => {
   const navigate = useNavigate();

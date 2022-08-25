@@ -12,16 +12,20 @@ import React, {
 import { useSelector } from 'react-redux';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { CHAT_ROUTE } from '../../utils/constansts';
 import { useAppDispatch } from '../../hooks/typedReduxHooks';
 import { selectors } from '../../store/slices/firebaseSlice';
 import { setUser } from '../../store/slices/userSlice';
+// eslint-disable-next-line import/no-cycle
+import { RoutesURLs } from '../../utils/routes';
 
 export const Login: FC<{}> = memo(() => {
   const app = useSelector(selectors.getFirebaseApp);
   const auth = getAuth(app);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // eslint-disable-next-line no-console
+  console.log(auth.currentUser, 'auth.currentUser');
 
   const singInWithGoogle = useCallback(async () => {
     try {
@@ -30,7 +34,7 @@ export const Login: FC<{}> = memo(() => {
       const result = await signInWithPopup(auth, provider);
 
       dispatch(setUser(result));
-      navigate(CHAT_ROUTE);
+      navigate(RoutesURLs.HOME);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
