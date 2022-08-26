@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Avatar,
@@ -165,14 +166,30 @@ export const Chat: FC<{}> = memo(() => {
           <TextField
             style={{ marginTop: 10 }}
             fullWidth
-            maxRows={1}
+            maxRows={3}
             multiline
             size="small"
             id="outlined-basic"
             label="Enter message"
             variant="outlined"
             value={inputMessage}
-            onChange={({ target }) => setInputMessage(target.value)}
+            onChange={(event) => {
+              const { target } = event;
+
+              setInputMessage(target.value);
+            }}
+            onKeyDown={(event) => {
+              if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.ctrlKey) {
+                setInputMessage((prev) => `${prev}\n`);
+
+                return;
+              }
+
+              if ((event.code === 'Enter' || event.code === 'NumpadEnter') && !event.ctrlKey) {
+                event.preventDefault();
+                writeMessageToDB();
+              }
+            }}
           />
           <Button
             variant="contained"
