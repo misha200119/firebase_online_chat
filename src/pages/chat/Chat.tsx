@@ -11,6 +11,7 @@ import React, {
   memo,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { useSelector } from 'react-redux';
@@ -27,27 +28,31 @@ import { useAuth } from '../../hooks/useAuth';
 import { selectors } from '../../store/slices/firebaseSlice';
 import { Message } from '../../types/message';
 
+import './Chat.scss';
+
 export const Chat: FC<{}> = memo(() => {
   const { user } = useAuth();
   const db = useSelector(selectors.getDatabase);
   const messagesRef = ref(db, 'posts');
   const [messages, setMessages] = useState<Array<Message>>([]);
+  const messagesDisplayBoxRef = useRef<HTMLDivElement | null>(null);
 
   const [inputMessage, setInputMessage] = useState('');
 
-  const writeMessageToDB = () => {
-    const newMessagesRef = push(messagesRef);
+  const writeMessageToDB = useCallback(() => {
+    if (inputMessage.trim()) {
+      const newMessagesRef = push(messagesRef);
 
-    set(newMessagesRef, {
-      uID: user?.uid,
-      username: user?.displayName,
-      email: user?.email,
-      profile_picture: user?.photoURL,
-      message: inputMessage,
-    });
-
-    setInputMessage('');
-  };
+      set(newMessagesRef, {
+        uID: user?.uid,
+        username: user?.displayName,
+        email: user?.email,
+        profile_picture: user?.photoURL,
+        message: inputMessage,
+      });
+      setInputMessage('');
+    }
+  }, [messagesRef, inputMessage]);
 
   let closeConnection: Unsubscribe;
 
@@ -56,6 +61,11 @@ export const Chat: FC<{}> = memo(() => {
       setMessages((prev: Array<Message>) => [...prev, data.val() as Message]);
     });
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    messagesDisplayBoxRef.current!.scrollTop = messagesDisplayBoxRef.current!.scrollHeight;
+  }, [messages]);
 
   useEffect(() => {
     return () => {
@@ -71,35 +81,78 @@ export const Chat: FC<{}> = memo(() => {
         justifyContent="center"
         direction="column"
         display="flex"
-        style={{ height: window.innerHeight - 64 }}
+        style={{
+          height: window.innerHeight - 70,
+          maxHeight: window.innerHeight - 70,
+        }}
       >
         <div
-          style={{
-            width: '80%',
-            height: '70vh',
-            border: '1px solid gray',
-            overflowY: 'auto',
-          }}
+          className="messagesBox"
+          ref={messagesDisplayBoxRef}
         >
           {messages.map(message => (
-            <div
-              key={nanoid()}
-              style={{
-                margin: 10,
-                border: user?.uid === message.uID ? '2px solid green' : '2px solid red',
-                marginLeft: user?.uid === message.uID ? 'auto' : '10px',
-                width: 'fit-content',
-                padding: 5,
-              }}
-            >
-              <Grid container>
-                <Avatar src={message.profile_picture} />
-                <div>{message.username}</div>
-              </Grid>
-              <div>
-                {message.message}
-              </div>
-            </div>
+            user?.uid === message.uID
+              ? (
+                <div
+                  key={nanoid()}
+                  style={{
+                    display: 'flex',
+                    gridGap: '1px',
+                    justifyContent: 'end',
+                    padding: '0 20px',
+                  }}
+                >
+                  <div
+                    className="message-cloud message-cloud--from-me"
+                  >
+                    <div>
+                      {message.message}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Avatar src={message.profile_picture} />
+                  </div>
+                </div>
+              )
+              : (
+                <div
+                  key={nanoid()}
+                  style={{
+                    display: 'flex',
+                    gridGap: '1px',
+                    justifyContent: 'start',
+                    padding: '0 20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Avatar src={message.profile_picture} />
+                  </div>
+                  <div
+                    className="message-cloud message-cloud--from-them"
+                  >
+                    <div>
+                      {message.username}
+                    </div>
+                    <div>
+                      {message.message}
+                    </div>
+                  </div>
+                </div>
+              )
           ))}
         </div>
 
@@ -107,7 +160,7 @@ export const Chat: FC<{}> = memo(() => {
           container
           alignItems="flex-end"
           direction="column"
-          style={{ width: '80%' }}
+          style={{ width: '90%' }}
         >
           <TextField
             style={{ marginTop: 10 }}

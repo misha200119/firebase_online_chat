@@ -16,30 +16,32 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
+  Auth,
   GoogleAuthProvider,
   OAuthCredential,
-  reauthenticateWithCredential,
+  // reauthenticateWithCredential,
   User,
   UserCredential,
 } from 'firebase/auth';
 import { RootState } from '../../types/storeTypes';
-import LocalStorageKeys from '../../utils/localStorageKeys';
 
-const credentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.AUTH_CREDENTIALS) as string);
-const userCredentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.USER_CREDENTIALS) as string);
-const lastSignedUser = reauthenticateWithCredential(userCredentialsFromLocalStorage, credentialsFromLocalStorage);
+// const credentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.AUTH_CREDENTIALS) as string);
+// const userCredentialsFromLocalStorage = JSON.parse(localStorage.getItem(LocalStorageKeys.USER_CREDENTIALS) as string);
+// const lastSignedUser = reauthenticateWithCredential(userCredentialsFromLocalStorage, credentialsFromLocalStorage);
 
 // eslint-disable-next-line no-console
-console.log(lastSignedUser);
+// console.log(lastSignedUser);
 
 interface authorizationState {
   user: User | null;
   credential: OAuthCredential | null;
+  auth: Auth | null;
 }
 
 const initialSate: authorizationState = {
   user: null,
   credential: null,
+  auth: null,
 };
 
 export const userSlice = createSlice({
@@ -52,8 +54,12 @@ export const userSlice = createSlice({
 
       state.user = userCredentials;
       state.credential = credentials;
-      localStorage.setItem(LocalStorageKeys.AUTH_CREDENTIALS, JSON.stringify(credentials));
-      localStorage.setItem(LocalStorageKeys.USER_CREDENTIALS, JSON.stringify(userCredentials));
+    },
+    setAuth: (state, action: PayloadAction<Auth>) => {
+      state.auth = action.payload;
+    },
+    setDirectlyUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
     },
     removeUser: (state) => {
       state.user = null;
@@ -65,11 +71,14 @@ export const userSlice = createSlice({
 export const {
   setUser,
   removeUser,
+  setDirectlyUser,
+  setAuth,
 } = userSlice.actions;
 
 export const selectors = {
   getUserInfo: (state: RootState) => state.user.user,
   getUserСredential: (state: RootState) => state.user.credential,
+  getAuth: (state: RootState) => state.user.auth,
 };
 
 export default userSlice.reducer;

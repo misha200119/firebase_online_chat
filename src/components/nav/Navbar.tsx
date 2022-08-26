@@ -9,12 +9,12 @@ import {
   Box,
   Menu,
   MenuItem,
-  Button,
   Tooltip,
   Avatar,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatIcon from '@mui/icons-material/Chat';
+import LoginIcon from '@mui/icons-material/Login';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import { useAuth } from '../../hooks/useAuth';
@@ -34,7 +34,7 @@ enum UserSettingsDropdown {
 }
 
 export const Navbar: FC<{}> = memo(() => {
-  const { isAuth: isLoggedIn, user } = useAuth();
+  const { isAuth: isLoggedIn, user, auth } = useAuth();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -45,8 +45,11 @@ export const Navbar: FC<{}> = memo(() => {
     setAnchorElNav(event.currentTarget);
   };
 
-  const handleCloseNavMenu = (page: Pages) => {
-    navigate(page.toLowerCase());
+  const handleCloseNavMenu = (page: Pages | null) => {
+    if (page) {
+      navigate(page.toLowerCase());
+    }
+
     setAnchorElNav(null);
   };
 
@@ -54,10 +57,14 @@ export const Navbar: FC<{}> = memo(() => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseUserMenu = (setting: UserSettingsDropdown) => {
+  const handleCloseUserMenu = async (setting: UserSettingsDropdown) => {
     switch (setting) {
       case UserSettingsDropdown.LOGOUT:
-        dispatch(removeUser());
+        if (auth) {
+          await auth.signOut();
+          dispatch(removeUser());
+        }
+
         break;
       default:
         // throw new Error('unexpected selected menu option');
@@ -116,7 +123,9 @@ export const Navbar: FC<{}> = memo(() => {
                   horizontal: 'left',
                 }}
                 open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
+                onClose={() => {
+                  handleCloseNavMenu(null);
+                }}
                 sx={{
                   display: { xs: 'block', md: 'none' },
                 }}
@@ -203,24 +212,16 @@ export const Navbar: FC<{}> = memo(() => {
                     </>
                   )
                   : (
-                    <Button>
-                      <NavLink
-                        to={RoutesURLs.LOGIN}
-                        style={({ isActive }) => (
-                          isActive
-                            ? {
-                              color: '#fff',
-                              background: '#7600dc',
-                            }
-                            : {
-                              color: '#545e6f',
-                              background: '#f0f0f0',
-                            }
-                        )}
-                      >
-                        Login
-                      </NavLink>
-                    </Button>
+                    <NavLink
+                      to={RoutesURLs.LOGIN}
+                      style={() => (
+                        {
+                          color: '#fff',
+                        }
+                      )}
+                    >
+                      <LoginIcon />
+                    </NavLink>
                   )
               }
             </Box>
