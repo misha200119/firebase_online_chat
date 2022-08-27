@@ -8,7 +8,6 @@ interface Props {
   clientID: string;
   provideMediaRef: (clientID: string, instanceHTMLVideoElement: HTMLVideoElement | null) => void;
   containerLayoutStyle: {width: string, height: string};
-
 }
 export const Video: FC<Props> = memo(({
   clientID,
@@ -21,15 +20,16 @@ export const Video: FC<Props> = memo(({
     <div
       style={
         {
+          ...containerLayoutStyle,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          height: '100%',
         }
       }
     >
       <div
         style={{
-          ...containerLayoutStyle,
           borderRadius: '20px',
           overflow: 'hidden',
           position: 'relative',

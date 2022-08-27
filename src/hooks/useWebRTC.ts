@@ -219,5 +219,34 @@ export const useWebRTC = (roomID: string) => {
     peerMediaElements.current[id] = node;
   }, []);
 
-  return { clients, provideMediaRef };
+  const deviceMuteSetter = useCallback((isTurnOn: boolean, device: 'microphone' | 'camera') => {
+    if (localMediaSteam.current) {
+      const tracks = localMediaSteam.current.getTracks();
+
+      switch (device) {
+        case 'microphone':
+          // eslint-disable-next-line no-case-declarations
+          const audioTrack = tracks.find((track) => track.kind === 'audio');
+
+          if (audioTrack) {
+            audioTrack.enabled = isTurnOn;
+          }
+
+          break;
+        case 'camera':
+          // eslint-disable-next-line no-case-declarations
+          const videoTrack = tracks.find((track) => track.kind === 'video');
+
+          if (videoTrack) {
+            videoTrack.enabled = isTurnOn;
+          }
+
+          break;
+        default:
+          throw new Error('unexpected type of device');
+      }
+    }
+  }, []);
+
+  return { clients, provideMediaRef, deviceMuteSetter };
 };
