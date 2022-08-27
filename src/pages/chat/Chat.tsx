@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Avatar,
-  Button,
   Container,
   Grid,
+  IconButton,
   TextField,
 } from '@mui/material';
 import React, {
@@ -169,6 +169,18 @@ export const Chat: FC<{}> = memo(() => {
             maxRows={3}
             multiline
             size="small"
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  color="primary"
+                  aria-label="upload picture"
+                  component="label"
+                  onClick={writeMessageToDB}
+                >
+                  <SendIcon />
+                </IconButton>
+              ),
+            }}
             id="outlined-basic"
             label="Enter message"
             variant="outlined"
@@ -191,14 +203,6 @@ export const Chat: FC<{}> = memo(() => {
               }
             }}
           />
-          <Button
-            variant="contained"
-            size="small"
-            onClick={writeMessageToDB}
-            endIcon={<SendIcon />}
-          >
-            Send
-          </Button>
         </Grid>
       </Grid>
     </Container>
