@@ -5,6 +5,6 @@ Firebase,
 React,
 Scss,
 Redux,
-ReactRouter
+ReactRouter,
 WebRTC,
 SocketIO
