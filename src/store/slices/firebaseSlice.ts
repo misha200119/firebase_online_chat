@@ -48,9 +48,6 @@ export const firebaseSlice = createSlice({
   },
 });
 
-// export const {
-// } = firebaseSlice.actions;
-
 export const selectors = {
   getFirebaseApp: (state: RootState) => state.firebaseApp.app,
   getDatabase: (state: RootState) => state.firebaseApp.database,

@@ -1,51 +1,38 @@
-import React, { FC, memo } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import React, { FC, memo, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { getAuth } from 'firebase/auth';
 import { Navbar } from '../nav';
-import {
-  ROOT_PATH,
-  WRONG_PATH,
-  HOME_ROUTE,
-  LOGIN_ROUTE,
-  CHAT_ROUTE,
-} from '../../utils/constansts';
 
-import { Home } from '../../pages/home';
-import { NotFound } from '../../pages/notFound';
-import { Login } from '../../pages/login';
-import { Chat } from '../../pages/chat';
+import { AppRouter } from '../appRouter';
+import { selectors } from '../../store/slices/firebaseSlice';
+import { useAppDispatch } from '../../hooks/typedReduxHooks';
+import { setAuth, setDirectlyUser } from '../../store/slices/userSlice';
 
-// import { AppRouter } from '../appRouter';
 import './App.scss';
 
 export const App: FC<{}> = memo(() => {
-  const { isAuth: isLoggedIn } = useAuth();
+  const dispatch = useAppDispatch();
+  const app = useSelector(selectors.getFirebaseApp);
+  const auth = getAuth(app);
+
+  dispatch(setAuth(auth));
+
+  const unsubscribe = auth.onAuthStateChanged((user) => {
+    if (user) {
+      dispatch(setDirectlyUser(user));
+    }
+  });
+
+  useEffect(() => {
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <>
       <Navbar />
-      {/* <AppRouter /> */}
-      {isLoggedIn
-        ? (
-          <Routes>
-            <Route path={ROOT_PATH} element={<Navigate to={HOME_ROUTE} replace />} />
-
-            <Route path={HOME_ROUTE} element={<Home />} />
-            <Route path={CHAT_ROUTE} element={<Chat />} />
-
-            <Route path={WRONG_PATH} element={<NotFound />} />
-          </Routes>
-        )
-        : (
-          <Routes>
-            <Route path={ROOT_PATH} element={<Navigate to={HOME_ROUTE} replace />} />
-
-            <Route path={HOME_ROUTE} element={<Home />} />
-            <Route path={LOGIN_ROUTE} element={<Login />} />
-
-            <Route path={WRONG_PATH} element={<NotFound />} />
-          </Routes>
-        )}
+      <AppRouter />
     </>
   );
 });

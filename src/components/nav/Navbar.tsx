@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+/* eslint-disable no-shadow */
+import React, { FC, memo } from 'react';
 import {
   AppBar,
   IconButton,
@@ -8,25 +9,34 @@ import {
   Box,
   Menu,
   MenuItem,
-  Button,
   Tooltip,
   Avatar,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatIcon from '@mui/icons-material/Chat';
-import { NavLink } from 'react-router-dom';
+import LoginIcon from '@mui/icons-material/Login';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
-import { LOGIN_ROUTE } from '../../utils/constansts';
 import { useAuth } from '../../hooks/useAuth';
 import { removeUser } from '../../store/slices/userSlice';
 import { useAppDispatch } from '../../hooks/typedReduxHooks';
+import { RoutesURLs } from '../../utils/routes';
 
-const pages = ['Products', 'Pricing'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+enum Pages {
+  CHAT = 'Chat',
+  HOME = 'Home',
+  VIDEOCHAT = 'Videochat',
+}
 
-export const Navbar: FC<{}> = () => {
-  const { isAuth: isLoggedIn, user } = useAuth();
+enum UserSettingsDropdown {
+  PROFILE = 'Profile',
+  LOGOUT = 'Logout',
+}
+
+export const Navbar: FC<{}> = memo(() => {
+  const { isAuth: isLoggedIn, user, auth } = useAuth();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -35,20 +45,26 @@ export const Navbar: FC<{}> = () => {
     setAnchorElNav(event.currentTarget);
   };
 
+  const handleCloseNavMenu = (page: Pages | null) => {
+    if (page) {
+      navigate(page.toLowerCase());
+    }
+
+    setAnchorElNav(null);
+  };
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  const handleCloseUserMenu = async (setting: UserSettingsDropdown) => {
+    switch (setting) {
+      case UserSettingsDropdown.LOGOUT:
+        if (auth) {
+          await auth.signOut();
+          dispatch(removeUser());
+        }
 
-  const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    const target = event.currentTarget as HTMLElement;
-
-    switch (target.textContent) {
-      case 'Logout':
-        dispatch(removeUser());
         break;
       default:
         // throw new Error('unexpected selected menu option');
@@ -60,7 +76,9 @@ export const Navbar: FC<{}> = () => {
 
   return (
     <header>
-      <AppBar position="static">
+      <AppBar
+        position="static"
+      >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <ChatIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -78,7 +96,7 @@ export const Navbar: FC<{}> = () => {
                 textDecoration: 'none',
               }}
             >
-              Chat roulette
+              Chat
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -105,13 +123,20 @@ export const Navbar: FC<{}> = () => {
                   horizontal: 'left',
                 }}
                 open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
+                onClose={() => {
+                  handleCloseNavMenu(null);
+                }}
                 sx={{
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                {Object.values(Pages).map((page) => (
+                  <MenuItem
+                    key={nanoid()}
+                    onClick={() => {
+                      handleCloseNavMenu(page);
+                    }}
+                  >
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
@@ -132,17 +157,18 @@ export const Navbar: FC<{}> = () => {
                 textDecoration: 'none',
               }}
             >
-              Chat roulette
+              Chat
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+              {Object.values(Pages).map((page) => (
+                <MenuItem
+                  key={nanoid()}
+                  onClick={() => {
+                    handleCloseNavMenu(page);
+                  }}
                 >
-                  {page}
-                </Button>
+                  <Typography textAlign="center">{page}</Typography>
+                </MenuItem>
               ))}
             </Box>
 
@@ -153,7 +179,7 @@ export const Navbar: FC<{}> = () => {
                     <>
                       <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                          <Avatar alt="Remy Sharp" src={user.photoURL || ''} />
+                          <Avatar alt="User Avatar" src={user.photoURL || ''} />
                         </IconButton>
                       </Tooltip>
                       <Menu
@@ -172,8 +198,13 @@ export const Navbar: FC<{}> = () => {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                       >
-                        {settings.map((setting) => (
-                          <MenuItem key={nanoid()} onClick={handleCloseUserMenu}>
+                        {Object.values(UserSettingsDropdown).map((setting) => (
+                          <MenuItem
+                            key={nanoid()}
+                            onClick={() => {
+                              handleCloseUserMenu(setting);
+                            }}
+                          >
                             <Typography textAlign="center">{setting}</Typography>
                           </MenuItem>
                         ))}
@@ -181,11 +212,16 @@ export const Navbar: FC<{}> = () => {
                     </>
                   )
                   : (
-                    <Button>
-                      <NavLink to={LOGIN_ROUTE}>
-                        Login
-                      </NavLink>
-                    </Button>
+                    <NavLink
+                      to={RoutesURLs.LOGIN}
+                      style={() => (
+                        {
+                          color: '#fff',
+                        }
+                      )}
+                    >
+                      <LoginIcon />
+                    </NavLink>
                   )
               }
             </Box>
@@ -194,4 +230,4 @@ export const Navbar: FC<{}> = () => {
       </AppBar>
     </header>
   );
-};
+});

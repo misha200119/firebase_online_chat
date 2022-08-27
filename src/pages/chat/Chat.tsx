@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Avatar,
-  Button,
   Container,
   Grid,
+  IconButton,
   TextField,
 } from '@mui/material';
 import React, {
@@ -11,6 +12,7 @@ import React, {
   memo,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,32 +23,37 @@ import {
   onChildAdded,
   Unsubscribe,
 } from 'firebase/database';
+import SendIcon from '@mui/icons-material/Send';
 import { nanoid } from 'nanoid';
 import { useAuth } from '../../hooks/useAuth';
 import { selectors } from '../../store/slices/firebaseSlice';
 import { Message } from '../../types/message';
+
+import './Chat.scss';
 
 export const Chat: FC<{}> = memo(() => {
   const { user } = useAuth();
   const db = useSelector(selectors.getDatabase);
   const messagesRef = ref(db, 'posts');
   const [messages, setMessages] = useState<Array<Message>>([]);
+  const messagesDisplayBoxRef = useRef<HTMLDivElement | null>(null);
 
   const [inputMessage, setInputMessage] = useState('');
 
-  const writeMessageToDB = () => {
-    const newMessagesRef = push(messagesRef);
+  const writeMessageToDB = useCallback(() => {
+    if (inputMessage.trim()) {
+      const newMessagesRef = push(messagesRef);
 
-    set(newMessagesRef, {
-      uID: user?.uid,
-      username: user?.displayName,
-      email: user?.email,
-      profile_picture: user?.photoURL,
-      message: inputMessage,
-    });
-
-    setInputMessage('');
-  };
+      set(newMessagesRef, {
+        uID: user?.uid,
+        username: user?.displayName,
+        email: user?.email,
+        profile_picture: user?.photoURL,
+        message: inputMessage,
+      });
+      setInputMessage('');
+    }
+  }, [messagesRef, inputMessage]);
 
   let closeConnection: Unsubscribe;
 
@@ -57,14 +64,15 @@ export const Chat: FC<{}> = memo(() => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    messagesDisplayBoxRef.current!.scrollTop = messagesDisplayBoxRef.current!.scrollHeight;
+  }, [messages]);
+
+  useEffect(() => {
     return () => {
       closeConnection();
     };
   }, []);
-
-  // const onMessagesUpdate = useCallback(() => {
-
-  // }, []);
 
   return (
     <Container>
@@ -74,35 +82,78 @@ export const Chat: FC<{}> = memo(() => {
         justifyContent="center"
         direction="column"
         display="flex"
-        style={{ height: window.innerHeight - 64 }}
+        style={{
+          height: window.innerHeight - 70,
+          maxHeight: window.innerHeight - 70,
+        }}
       >
         <div
-          style={{
-            width: '80%',
-            height: '70vh',
-            border: '1px solid gray',
-            overflowY: 'auto',
-          }}
+          className="messagesBox"
+          ref={messagesDisplayBoxRef}
         >
           {messages.map(message => (
-            <div
-              key={nanoid()}
-              style={{
-                margin: 10,
-                border: user?.uid === message.uID ? '2px solid green' : '2px solid red',
-                marginLeft: user?.uid === message.uID ? 'auto' : '10px',
-                width: 'fit-content',
-                padding: 5,
-              }}
-            >
-              <Grid container>
-                <Avatar src={message.profile_picture} />
-                <div>{message.username}</div>
-              </Grid>
-              <div>
-                {message.message}
-              </div>
-            </div>
+            user?.uid === message.uID
+              ? (
+                <div
+                  key={nanoid()}
+                  style={{
+                    display: 'flex',
+                    gridGap: '1px',
+                    justifyContent: 'end',
+                    padding: '0 20px',
+                  }}
+                >
+                  <div
+                    className="message-cloud message-cloud--from-me"
+                  >
+                    <div>
+                      {message.message}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Avatar src={message.profile_picture} />
+                  </div>
+                </div>
+              )
+              : (
+                <div
+                  key={nanoid()}
+                  style={{
+                    display: 'flex',
+                    gridGap: '1px',
+                    justifyContent: 'start',
+                    padding: '0 20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Avatar src={message.profile_picture} />
+                  </div>
+                  <div
+                    className="message-cloud message-cloud--from-them"
+                  >
+                    <div>
+                      {message.username}
+                    </div>
+                    <div>
+                      {message.message}
+                    </div>
+                  </div>
+                </div>
+              )
           ))}
         </div>
 
@@ -110,26 +161,49 @@ export const Chat: FC<{}> = memo(() => {
           container
           alignItems="flex-end"
           direction="column"
-          style={{ width: '80%' }}
+          style={{ width: '90%' }}
         >
           <TextField
             style={{ marginTop: 10 }}
             fullWidth
-            maxRows={1}
+            maxRows={3}
             multiline
             size="small"
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  color="primary"
+                  aria-label="upload picture"
+                  component="label"
+                  onClick={writeMessageToDB}
+                  size="small"
+                >
+                  <SendIcon />
+                </IconButton>
+              ),
+            }}
             id="outlined-basic"
             label="Enter message"
             variant="outlined"
             value={inputMessage}
-            onChange={({ target }) => setInputMessage(target.value)}
+            onChange={(event) => {
+              const { target } = event;
+
+              setInputMessage(target.value);
+            }}
+            onKeyDown={(event) => {
+              if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.ctrlKey) {
+                setInputMessage((prev) => `${prev}\n`);
+
+                return;
+              }
+
+              if ((event.code === 'Enter' || event.code === 'NumpadEnter') && !event.ctrlKey) {
+                event.preventDefault();
+                writeMessageToDB();
+              }
+            }}
           />
-          <Button
-            size="small"
-            onClick={writeMessageToDB}
-          >
-            Send
-          </Button>
         </Grid>
       </Grid>
     </Container>
