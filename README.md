@@ -6,3 +6,5 @@ React,
 Scss,
 Redux,
 ReactRouter
+WebRTC,
+SocketIO
