@@ -176,6 +176,7 @@ export const Chat: FC<{}> = memo(() => {
                   aria-label="upload picture"
                   component="label"
                   onClick={writeMessageToDB}
+                  size="small"
                 >
                   <SendIcon />
                 </IconButton>

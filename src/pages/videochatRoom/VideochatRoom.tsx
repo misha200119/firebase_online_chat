@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/media-has-caption */
 import { Container } from '@mui/system';
 import React, { FC, memo } from 'react';

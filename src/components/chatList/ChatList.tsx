@@ -16,23 +16,22 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
-// import { VIDEOCHAT_ROUTE } from '../../utils/constansts';
+// eslint-disable-next-line import/no-cycle
+import { RoutesURLs } from '../../utils/routes';
 
 interface Props {
   rooms: Array<string>;
 }
 
-const VIDEOCHAT_ROUTE = '123';
-
 export const ChatList:FC<Props> = memo(({ rooms }) => {
   const navigate = useNavigate();
 
   const createNewRoom = useCallback(() => {
-    navigate(`${VIDEOCHAT_ROUTE}/${v4()}`);
+    navigate(`${RoutesURLs.VIDEOCHAT}/${v4()}`);
   }, []);
 
   const connectRoom = useCallback((roomID: string) => {
-    navigate(`${VIDEOCHAT_ROUTE}/${roomID}`);
+    navigate(`${RoutesURLs.VIDEOCHAT}/${roomID}`);
   }, []);
 
   return (
