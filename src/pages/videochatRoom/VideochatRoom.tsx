@@ -2,7 +2,8 @@
 import { Container } from '@mui/system';
 import React, { FC, memo } from 'react';
 import { useParams } from 'react-router-dom';
-import { LOCAL_VIDEO, useWebRTC } from '../../hooks/useWebRTC';
+import { useWebRTC } from '../../hooks/useWebRTC';
+import { Video } from '../../components/video';
 
 function layout(clientsCount = 1) {
   const pairs = Array.from<any>({ length: clientsCount })
@@ -48,22 +49,28 @@ export const VideochatRoom: FC<{}> = memo(() => {
           alignItems: 'center',
           justifyContent: 'center',
           flexWrap: 'wrap',
-          height: '70vh',
+          height: '80vh',
         }}
       >
         {clients.map((clientID: string, index: number) => (
-          <div key={clientID} style={videoLayout[index]}>
-            <video
-              ref={(instance) => {
-                provideMediaRef(clientID, instance);
-              }}
-              width="100%"
-              height="100%"
-              autoPlay
-              playsInline
-              muted={clientID === LOCAL_VIDEO}
-            />
-          </div>
+          <Video
+            clientID={clientID}
+            provideMediaRef={provideMediaRef}
+            key={clientID}
+            containerLayoutStyle={videoLayout[index]}
+          />
+          // <div key={clientID} style={videoLayout[index]}>
+          //   <video
+          //     ref={(instance) => {
+          //       provideMediaRef(clientID, instance);
+          //     }}
+          //     width="100%"
+          //     height="100%"
+          //     autoPlay
+          //     playsInline
+          //     muted={clientID === LOCAL_VIDEO}
+          //   />
+          // </div>
         ))}
       </div>
     </Container>

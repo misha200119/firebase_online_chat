@@ -215,7 +215,7 @@ export const useWebRTC = (roomID: string) => {
     };
   }, [roomID]);
 
-  const provideMediaRef = useCallback((id, node) => {
+  const provideMediaRef = useCallback((id: string, node) => {
     peerMediaElements.current[id] = node;
   }, []);
 
