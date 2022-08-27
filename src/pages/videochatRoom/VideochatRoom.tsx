@@ -59,18 +59,6 @@ export const VideochatRoom: FC<{}> = memo(() => {
             key={clientID}
             containerLayoutStyle={videoLayout[index]}
           />
-          // <div key={clientID} style={videoLayout[index]}>
-          //   <video
-          //     ref={(instance) => {
-          //       provideMediaRef(clientID, instance);
-          //     }}
-          //     width="100%"
-          //     height="100%"
-          //     autoPlay
-          //     playsInline
-          //     muted={clientID === LOCAL_VIDEO}
-          //   />
-          // </div>
         ))}
       </div>
     </Container>

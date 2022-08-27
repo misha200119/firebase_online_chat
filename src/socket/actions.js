@@ -9,6 +9,7 @@ const ACTIONS = {
   RELAY_ICE: 'relay-ice',
   ICE_CANDIDATE: 'ice-candidate',
   SESSION_DESCRIPTION: 'session-desription',
+  USER_MUTED: 'user-muted',
 };
 
 module.exports = ACTIONS;
