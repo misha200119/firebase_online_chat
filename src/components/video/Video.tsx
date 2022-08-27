@@ -21,15 +21,13 @@ export const Video: FC<Props> = memo(({
       style={
         {
           ...containerLayoutStyle,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
         }
       }
     >
       <div
         style={{
+          width: '100%',
+          height: '100%',
           borderRadius: '20px',
           overflow: 'hidden',
           position: 'relative',

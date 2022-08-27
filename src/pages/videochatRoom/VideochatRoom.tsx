@@ -71,6 +71,7 @@ export const VideochatRoom: FC<{}> = memo(() => {
           display: 'flex',
           alignItems: 'center',
           height: '80vh',
+          flexWrap: 'wrap',
         }}
       >
         {clients.map((clientID: string, index: number) => (
