@@ -8,6 +8,7 @@ import { Home } from '../pages/home';
 // eslint-disable-next-line import/no-cycle
 import { Videochat } from '../pages/videochat';
 import { NotFound } from '../pages/notFound';
+// eslint-disable-next-line import/no-cycle
 import { VideochatRoom } from '../pages/videochatRoom';
 
 // eslint-disable-next-line no-shadow
@@ -45,13 +46,6 @@ export const publicRoutes: Routes = [
     path: RoutesURLs.WRONG,
     component: <NotFound />,
   },
-];
-
-export const privateRoutes: Routes = publicRoutes.concat([
-  {
-    path: RoutesURLs.CHAT,
-    component: <Chat />,
-  },
   {
     path: RoutesURLs.VIDEOCHAT,
     component: <Videochat />,
@@ -59,5 +53,12 @@ export const privateRoutes: Routes = publicRoutes.concat([
   {
     path: RoutesURLs.VIDEOCHAT_ROOM,
     component: <VideochatRoom />,
+  },
+];
+
+export const privateRoutes: Routes = publicRoutes.concat([
+  {
+    path: RoutesURLs.CHAT,
+    component: <Chat />,
   },
 ]);
